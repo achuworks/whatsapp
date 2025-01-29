@@ -23,38 +23,42 @@ def get_birthday_teachers():
     return rows
 
 def create_birthday_card(template_paths, name, photopath):
-    """
-    Create a birthday card for a teacher with their photo and name.
-    """
     template = Image.open(template_paths)
     template_width, template_height = template.size
-
-    # Resize and paste the teacher's photo
-    teacher_photo = Image.open(photopath)
-    teacher_photo = teacher_photo.resize((560, 580))
     
     if template_paths.endswith("template1.png"):
-        teacher_photo_x = 30
-        teacher_photo_y = 180
+        teacher_photo = Image.open(photopath).resize((560, 580))
+        teacher_photo_x, teacher_photo_y = 30, 180
+
     elif template_paths.endswith("template2.png"):
-        teacher_photo_x = 30   # Center horizontally
-        teacher_photo_y = 180  # Adjust vertical position   
+        teacher_photo = Image.open(photopath).resize((512, 530))
+        teacher_photo_x, teacher_photo_y = 50, 190
+
     elif template_paths.endswith("template4.png"):
-        teacher_photo_x = (template_width - teacher_photo.width) // 2  # Center horizontally
-        teacher_photo_y = 330  # Adjust vertical position
+        teacher_photo = Image.open(photopath).resize((400, 400))
+        teacher_photo_x = (template_width - teacher_photo.width) // 2  
+        teacher_photo_y = 340
+
     elif template_paths.endswith("template5.png"):
-        teacher_photo_x = (template_width - teacher_photo.width) // 2  # Center horizontally
-        teacher_photo_y = 355  # Adjust vertical position
+        teacher_photo = Image.open(photopath).resize((530, 560))
+        teacher_photo_x = (template_width - teacher_photo.width) // 2  
+        teacher_photo_y = 355
+
     elif template_paths.endswith("template6.png"):
-        teacher_photo_x = (template_width - teacher_photo.width) // 2  # Center horizontally
-        teacher_photo_y = 550  # Adjust vertical position
+        teacher_photo = Image.open(photopath).resize((700, 500))
+        teacher_photo_x = (template_width - teacher_photo.width) // 2  
+        teacher_photo_y = 550
+
     elif template_paths.endswith("template10.png"):
-        teacher_photo_x = 1132
-        teacher_photo_y = 468 
+        teacher_photo = Image.open(photopath).resize((770, 520))
+        teacher_photo_x, teacher_photo_y = 1132, 468
+
     elif template_paths.endswith("template11.png"):
-        teacher_photo_x = 215
-        teacher_photo_y = 320
-    template.paste(teacher_photo, (teacher_photo_x,teacher_photo_y))
+        teacher_photo = Image.open(photopath).resize((590, 600))
+        teacher_photo_x, teacher_photo_y = 215, 320
+    else:
+        raise ValueError(f"Unknown template: {template_paths}")
+    template.paste(teacher_photo, (teacher_photo_x, teacher_photo_y)) 
 
     draw = ImageDraw.Draw(template)
     font = ImageFont.truetype("arial.ttf", 40)
