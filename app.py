@@ -1,5 +1,5 @@
 import mysql.connector
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 import io
 import webbrowser
 import time
@@ -25,7 +25,7 @@ def get_birthday_teachers():
 def create_birthday_card(template_paths, name, photopath):
     template = Image.open(template_paths)
     template_width, template_height = template.size
-    
+
     if template_paths.endswith("template1.png"):
         teacher_photo = Image.open(photopath).resize((560, 580))
         teacher_photo_x, teacher_photo_y = 30, 180
@@ -34,10 +34,15 @@ def create_birthday_card(template_paths, name, photopath):
         teacher_photo = Image.open(photopath).resize((512, 530))
         teacher_photo_x, teacher_photo_y = 50, 190
 
+    elif template_paths.endswith("template3.png"):
+        teacher_photo = Image.open(photopath).resize((450, 450))
+        teacher_photo_x = (template_width - teacher_photo.width) // 2  
+        teacher_photo_y = 400
+
     elif template_paths.endswith("template4.png"):
         teacher_photo = Image.open(photopath).resize((400, 400))
         teacher_photo_x = (template_width - teacher_photo.width) // 2  
-        teacher_photo_y = 340
+        teacher_photo_y = 360
 
     elif template_paths.endswith("template5.png"):
         teacher_photo = Image.open(photopath).resize((530, 560))
@@ -48,6 +53,19 @@ def create_birthday_card(template_paths, name, photopath):
         teacher_photo = Image.open(photopath).resize((700, 500))
         teacher_photo_x = (template_width - teacher_photo.width) // 2  
         teacher_photo_y = 550
+
+    elif template_paths.endswith("template7.png"):
+        teacher_photo = Image.open(photopath).resize((650, 520))
+        teacher_photo_x, teacher_photo_y = 1090, 368
+
+    elif template_paths.endswith("template8.png"):
+        teacher_photo = Image.open(photopath).resize((530, 560))
+        teacher_photo_x, teacher_photo_y = 1130, 400
+
+    elif template_paths.endswith("template9.png"):
+        teacher_photo = Image.open(photopath).resize((550, 590))
+        teacher_photo_x = (template_width - teacher_photo.width) // 2  
+        teacher_photo_y = 545
 
     elif template_paths.endswith("template10.png"):
         teacher_photo = Image.open(photopath).resize((770, 520))
@@ -97,9 +115,13 @@ def send_birthday_greetings(rows):
     temp = [
         r"C:\whatsapp\templates\template1.png",
         r"C:\whatsapp\templates\template2.png",
+        r"C:\whatsapp\templates\template3.png",
         r"C:\whatsapp\templates\template4.png",
         r"C:\whatsapp\templates\template5.png",
         r"C:\whatsapp\templates\template6.png",
+        r"C:\whatsapp\templates\template7.png",
+        r"C:\whatsapp\templates\template8.png",
+        r"C:\whatsapp\templates\template9.png",
         r"C:\whatsapp\templates\template10.png",
         r"C:\whatsapp\templates\template11.png"
     ]
@@ -129,13 +151,13 @@ def send_birthday_greetings(rows):
             
             image_paths.append(card_output_path)
 
-            message = f"🎉 Happy Birthday! 🎂"
-            time.sleep(1)
-            auto.press('enter')
-            time.sleep(3)
-            auto.write(message)
-            auto.press('enter')
-            time.sleep(2)
+    message = f"🎉 Happy Birthday! 🎂"
+    time.sleep(1)
+    auto.press('enter')
+    time.sleep(3)
+    auto.write(message)
+    auto.press('enter')
+    time.sleep(2)
     video_path = create_birthday_video(image_paths, music_file)
     time.sleep(2)  
     auto.click(x=571, y=914)
@@ -173,5 +195,5 @@ groupName = "Scheduler"
 schedule_whatsapp_message(groupName) 
 send_birthday_greetings(rows)
 
-time.sleep(8)
+time.sleep(10)
 auto.hotkey('alt', 'f4')
