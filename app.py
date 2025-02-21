@@ -112,18 +112,20 @@ def create_birthday_video(image_paths, music_file):
     return output_path
 
 def send_birthday_greetings(rows):
+    if not rows:
+        return
     temp = [
-        r"C:\whatsapp\templates\template1.png",
-        r"C:\whatsapp\templates\template2.png",
-        r"C:\whatsapp\templates\template3.png",
-        r"C:\whatsapp\templates\template4.png",
-        r"C:\whatsapp\templates\template5.png",
-        r"C:\whatsapp\templates\template6.png",
-        r"C:\whatsapp\templates\template7.png",
-        r"C:\whatsapp\templates\template8.png",
+        # r"C:\whatsapp\templates\template1.png",
+        # r"C:\whatsapp\templates\template2.png",
+        # r"C:\whatsapp\templates\template3.png",
+        # r"C:\whatsapp\templates\template4.png",
+        # r"C:\whatsapp\templates\template5.png",
+        # r"C:\whatsapp\templates\template6.png",
+        # r"C:\whatsapp\templates\template7.png",
+        # r"C:\whatsapp\templates\template8.png",
         r"C:\whatsapp\templates\template9.png",
-        r"C:\whatsapp\templates\template10.png",
-        r"C:\whatsapp\templates\template11.png"
+        # r"C:\whatsapp\templates\template10.png",
+        # r"C:\whatsapp\templates\template11.png"
     ]
     rand_idx = random.randint(0, len(temp)-1)
     template_paths=temp[rand_idx]
@@ -171,6 +173,9 @@ def send_birthday_greetings(rows):
     for i in image_paths:
         if os.path.exists(i):
             os.remove(i)
+    if os.path.exists("birthday_video.mp4"):
+        with open("birthday_video.mp4", "wb") as f:
+            pass 
 
 def schedule_whatsapp_message(groupName):
     webbrowser.open('https://web.whatsapp.com')
