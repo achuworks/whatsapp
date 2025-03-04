@@ -115,17 +115,17 @@ def send_birthday_greetings(rows):
     if not rows:
         return
     temp = [
-        # r"C:\whatsapp\templates\template1.png",
-        # r"C:\whatsapp\templates\template2.png",
-        # r"C:\whatsapp\templates\template3.png",
-        # r"C:\whatsapp\templates\template4.png",
-        # r"C:\whatsapp\templates\template5.png",
-        # r"C:\whatsapp\templates\template6.png",
-        # r"C:\whatsapp\templates\template7.png",
-        # r"C:\whatsapp\templates\template8.png",
+        r"C:\whatsapp\templates\template1.png",
+        r"C:\whatsapp\templates\template2.png",
+        r"C:\whatsapp\templates\template3.png",
+        r"C:\whatsapp\templates\template4.png",
+        r"C:\whatsapp\templates\template5.png",
+        r"C:\whatsapp\templates\template6.png",
+        r"C:\whatsapp\templates\template7.png",
+        r"C:\whatsapp\templates\template8.png",
         r"C:\whatsapp\templates\template9.png",
-        # r"C:\whatsapp\templates\template10.png",
-        # r"C:\whatsapp\templates\template11.png"
+        r"C:\whatsapp\templates\template10.png",
+        r"C:\whatsapp\templates\template11.png"
     ]
     rand_idx = random.randint(0, len(temp)-1)
     template_paths=temp[rand_idx]
