@@ -18,7 +18,7 @@ def get_birthday_teachers():
         database="whatsapp_db"
     )
     cursor = connection.cursor()
-    cursor.execute("SELECT name, phone_number, date_of_birth, time, photopath FROM data_of_birth WHERE MONTH(date_of_birth) = MONTH(CURDATE()) AND DAY(date_of_birth) = DAY(CURDATE())")
+    cursor.execute("SELECT name, phone_number, date_of_birth, photopath FROM data_of_birth WHERE MONTH(date_of_birth) = MONTH(CURDATE()) AND DAY(date_of_birth) = DAY(CURDATE())")
     rows = cursor.fetchall()
     connection.close()
     return rows
@@ -203,7 +203,7 @@ def send_birthday_greetings(rows):
     for idx, row in enumerate(rows):
         name = row[0]
         phone_number = row[1]
-        photopath = row[4]
+        photopath = row[3]
         template_path = random.choice(template_paths_list)
         card_image = create_birthday_card(template_path, name, photopath)
         if card_image is None:
@@ -221,7 +221,7 @@ def send_birthday_greetings(rows):
             chairman_img_path="chairman.jpg",
             final_output_path=final_video_path
         )
-        message = f"\ud83c\udf89 Happy Birthday {name}! \ud83c\udf82"
+        message = f"Happy Birthday {name}!"
         send_to_phone_number(phone_number, message, final_video_path)
         for path in [card_output_path, raw_video_path, final_video_path]:
             if os.path.exists(path):
