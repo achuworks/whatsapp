@@ -30,97 +30,140 @@ def create_birthday_card(template_paths, name, photopath):
     print(f"Looking for photo at: {photopath}")
     print(f"Current working directory: {os.getcwd()}")
     
-    possible_paths = [
-        photopath,
-        os.path.join(os.getcwd(), photopath),
-        os.path.join(os.getcwd(), "photouploads", "Faculty", os.path.basename(photopath)),
-        os.path.join(os.getcwd(), "photouploadsFaculty", os.path.basename(photopath)),
-        os.path.join("photouploads", "Faculty", os.path.basename(photopath)),
-        os.path.join("photouploadsFaculty", os.path.basename(photopath)),
-        photopath.replace("\\", "/"),
-        photopath.replace("/", "\\"),
-        os.path.join(os.getcwd(), os.path.basename(photopath)),
-        os.path.basename(photopath)
-    ]
+    # Get base filename without extension
+    base_name = os.path.splitext(os.path.basename(photopath))[0]
     
-    name_from_path = os.path.basename(photopath)
-    if "Faculty" in name_from_path:
-        clean_name = name_from_path.replace("Faculty", "").strip()
+    # Try both .jpg and .png extensions
+    possible_paths = []
+    for ext in ['.jpg', '.png', '.jpeg', '.JPG', '.PNG', '.JPEG']:
+        filename = base_name + ext
         possible_paths.extend([
-            os.path.join(os.getcwd(), "photouploads", "Faculty", clean_name),
-            os.path.join("photouploads", "Faculty", clean_name),
-            os.path.join(os.getcwd(), "photouploadsFaculty", clean_name),
-            os.path.join("photouploadsFaculty", clean_name)
+            os.path.join(os.getcwd(), "photouploads", "Students", filename),
+            os.path.join(os.getcwd(), "photouploads", "Faculty", filename),
+            os.path.join(os.getcwd(), "photouploadsStudents", filename),
+            os.path.join(os.getcwd(), "photouploadsFaculty", filename),
+            os.path.join("photouploads", "Students", filename),
+            os.path.join("photouploads", "Faculty", filename),
+            os.path.join("photouploadsStudents", filename),
+            os.path.join("photouploadsFaculty", filename),
+            os.path.join(os.getcwd(), filename),
+            filename
         ])
     
     found_photo = None
     for path in possible_paths:
         if os.path.exists(path):
-            found_photo = path
-            print(f"Found photo at: {path}")
-            break
+            try:
+                # Try to open and verify the image
+                with Image.open(path) as img:
+                    img.verify()  # Verify image integrity
+                # If verification passes, open again for actual use
+                with Image.open(path) as img:
+                    # Convert to RGB if necessary
+                    if img.mode in ('RGBA', 'P'):
+                        img = img.convert('RGB')
+                    # Make a copy to ensure the image is fully loaded
+                    img_copy = img.copy()
+                found_photo = path
+                print(f"Found valid photo at: {path}")
+                break
+            except Exception as e:
+                print(f"Found file at {path} but it appears to be corrupted: {str(e)}")
+                continue
     
     if not found_photo:
-        print(f"Photo not found in any of these locations: {possible_paths}")
+        print(f"Photo not found or all photos corrupted in these locations: {possible_paths}")
         return None
 
-    if template_paths.endswith("template1.png"):
-        teacher_photo = Image.open(found_photo).resize((560, 580), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 30, 180
-    elif template_paths.endswith("template2.png"):
-        teacher_photo = Image.open(found_photo).resize((512, 530), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 50, 190
-    elif template_paths.endswith("template3.png"):
-        teacher_photo = Image.open(found_photo).resize((450, 450), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x = (template_width - teacher_photo.width) // 2
-        teacher_photo_y = 400
-    elif template_paths.endswith("template4.png"):
-        teacher_photo = Image.open(found_photo).resize((400, 400), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x = (template_width - teacher_photo.width) // 2
-        teacher_photo_y = 360
-    elif template_paths.endswith("template5.png"):
-        teacher_photo = Image.open(found_photo).resize((530, 560), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x = (template_width - teacher_photo.width) // 2
-        teacher_photo_y = 355
-    elif template_paths.endswith("template6.png"):
-        teacher_photo = Image.open(found_photo).resize((700, 500), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x = (template_width - teacher_photo.width) // 2
-        teacher_photo_y = 550
-    elif template_paths.endswith("template7.png"):
-        teacher_photo = Image.open(found_photo).resize((650, 520), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 1090, 368
-    elif template_paths.endswith("template8.png"):
-        teacher_photo = Image.open(found_photo).resize((530, 560), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 1130, 400
-    elif template_paths.endswith("template9.png"):
-        teacher_photo = Image.open(found_photo).resize((550, 590), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x = (template_width - teacher_photo.width) // 2
-        teacher_photo_y = 545
-    elif template_paths.endswith("template10.png"):
-        teacher_photo = Image.open(found_photo).resize((770, 520), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 1132, 468
-    elif template_paths.endswith("template11.png"):
-        teacher_photo = Image.open(found_photo).resize((590, 600), resample=Image.Resampling.LANCZOS)
-        teacher_photo_x, teacher_photo_y = 215, 320
-    else:
-        raise ValueError(f"Unknown template: {template_paths}")
-
-    template.paste(teacher_photo, (teacher_photo_x, teacher_photo_y))
-    draw = ImageDraw.Draw(template)
+    # Open and process the found photo
     try:
-        font = ImageFont.truetype("arial.ttf", 40)
-    except IOError:
-        font = ImageFont.load_default()
-    text_bbox = draw.textbbox((0, 0), name, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_x = teacher_photo_x + (teacher_photo.width - text_width) // 2
-    text_y = teacher_photo_y + teacher_photo.height + 20
-    draw.text((text_x, text_y), name, fill="black", font=font)
+        teacher_photo = Image.open(found_photo)
+        if teacher_photo.mode in ('RGBA', 'P'):
+            teacher_photo = teacher_photo.convert('RGB')
+            
+        # Resize based on template with improved quality settings
+        if template_paths.endswith("template1.png"):
+            teacher_photo = teacher_photo.resize((560, 580), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 30, 180
+        elif template_paths.endswith("template2.png"):
+            teacher_photo = teacher_photo.resize((512, 530), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 50, 190
+        elif template_paths.endswith("template3.png"):
+            target_size = (450, 450)
+            aspect_ratio = teacher_photo.width / teacher_photo.height
+            if aspect_ratio > 1:
+                new_width = target_size[0]
+                new_height = int(new_width / aspect_ratio)
+            else:
+                new_height = target_size[1]
+                new_width = int(new_height * aspect_ratio)
+            teacher_photo = teacher_photo.resize((new_width, new_height), Image.Resampling.BICUBIC)
+            teacher_photo_x = (template_width - teacher_photo.width) // 2
+            teacher_photo_y = 400
+        elif template_paths.endswith("template4.png"):
+            teacher_photo = teacher_photo.resize((400, 400), Image.Resampling.BICUBIC)
+            teacher_photo_x = (template_width - teacher_photo.width) // 2
+            teacher_photo_y = 360
+        elif template_paths.endswith("template5.png"):
+            teacher_photo = teacher_photo.resize((530, 560), Image.Resampling.BICUBIC)
+            teacher_photo_x = (template_width - teacher_photo.width) // 2
+            teacher_photo_y = 355
+        elif template_paths.endswith("template6.png"):
+            teacher_photo = teacher_photo.resize((700, 500), Image.Resampling.BICUBIC)
+            teacher_photo_x = (template_width - teacher_photo.width) // 2
+            teacher_photo_y = 550
+        elif template_paths.endswith("template7.png"):
+            teacher_photo = teacher_photo.resize((650, 520), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 1090, 368
+        elif template_paths.endswith("template8.png"):
+            teacher_photo = teacher_photo.resize((530, 560), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 1130, 400
+        elif template_paths.endswith("template9.png"):
+            teacher_photo = teacher_photo.resize((550, 590), Image.Resampling.BICUBIC)
+            teacher_photo_x = (template_width - teacher_photo.width) // 2
+            teacher_photo_y = 545
+        elif template_paths.endswith("template10.png"):
+            teacher_photo = teacher_photo.resize((770, 520), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 1132, 468
+        elif template_paths.endswith("template11.png"):
+            teacher_photo = teacher_photo.resize((590, 600), Image.Resampling.BICUBIC)
+            teacher_photo_x, teacher_photo_y = 215, 320
+        else:
+            raise ValueError(f"Unknown template: {template_paths}")
 
-    output = io.BytesIO()
-    template.save(output, format="PNG")
-    output.seek(0)
-    return output
+        # Create a copy of the template to avoid modifying the original
+        template_copy = template.copy()
+        
+        # Create a mask for smooth edges if needed
+        mask = Image.new('L', teacher_photo.size, 255)
+        
+        # Paste the photo with the mask for smooth edges
+        template_copy.paste(teacher_photo, (teacher_photo_x, teacher_photo_y), mask)
+        
+        # Add name with improved font rendering
+        draw = ImageDraw.Draw(template_copy)
+        try:
+            font = ImageFont.truetype("arial.ttf", 40)
+        except IOError:
+            font = ImageFont.load_default()
+            
+        text_bbox = draw.textbbox((0, 0), name, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_x = teacher_photo_x + (teacher_photo.width - text_width) // 2
+        text_y = teacher_photo_y + teacher_photo.height + 20
+        
+        # Draw text with anti-aliasing
+        draw.text((text_x, text_y), name, fill="black", font=font)
+
+        # Save to BytesIO with high quality
+        output = io.BytesIO()
+        template_copy.save(output, format="PNG", quality=100)
+        output.seek(0)
+        return output
+        
+    except Exception as e:
+        print(f"Error processing photo {found_photo}: {str(e)}")
+        return None
 
 def create_birthday_video(image_path, music_file, output_path):
     audio = AudioFileClip(music_file)
@@ -233,7 +276,7 @@ def send_to_phone_number(phone_number, message, video_path):
     print(f"Opening WhatsApp Web chat for {formatted_number}")
     webbrowser.open(url)
     
-    time.sleep(20)  
+    time.sleep(30)  
     
     try:
         auto.press('enter')
@@ -244,8 +287,8 @@ def send_to_phone_number(phone_number, message, video_path):
             auto.click(711, 956)  
             time.sleep(2)
             
-            auto.click(762, 615)  
-            time.sleep(2)
+            auto.click(686,583)  
+            time.sleep(2)  
             
             time.sleep(2)
             
@@ -256,7 +299,7 @@ def send_to_phone_number(phone_number, message, video_path):
             time.sleep(1)
             auto.press('enter')
             
-            time.sleep(8)
+            time.sleep(4)
             
             auto.click(711, 956)
             time.sleep(5)
@@ -315,9 +358,6 @@ def send_birthday_greetings(rows):
         )
         message = f"Happy Birthday {name}!"
         send_to_phone_number(phone_number, message, final_video_path)
-        for path in [card_output_path, raw_video_path, final_video_path]:
-            if os.path.exists(path):
-                os.remove(path)
 
 if __name__ == "__main__":
     rows = get_birthday_teachers()

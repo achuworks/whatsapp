@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+fresh_venv/
+venv/
+*.venv
+
+# Output folder for generated cards and videos
+output/
+
+# Temporary files from moviepy
+*TEMP_MPY_wvf_snd.mp3
+
+# PyInstaller files
+*.spec
+build/
+dist/
+
+# IDE / Editor specific
+.vscode/
+.idea/ 
