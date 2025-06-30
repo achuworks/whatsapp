@@ -1,0 +1,6 @@
+mysql-connector-python
+Pillow
+moviepy
+pyautogui
+pyperclip
+numpy 
